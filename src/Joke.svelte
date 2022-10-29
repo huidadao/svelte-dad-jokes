@@ -3,4 +3,10 @@
     export let joke
 </script>
 
-<Card body>{joke}</Card>
+<style>
+    :global(.card) {
+        margin-bottom: 10px;
+    }
+</style>
+
+<Card class="card" body>{joke}</Card>

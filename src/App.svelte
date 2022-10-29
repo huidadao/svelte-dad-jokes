@@ -4,6 +4,7 @@
     import { Col, Container, Row, Button } from 'sveltestrap';
     import Form from './Form.svelte'
     import Joke from './Joke.svelte'
+    import Transition from './Transition.svelte'
 
     let randomJoke
     let jokes = []
@@ -16,7 +17,9 @@
     async function onRandomJoke() {
         try {
             mode = 'random'
+            await sleep(1000)
             randomJoke = await getRandomJoke()
+            await sleep(1000)
         } catch(e) {
             console.log(e)
         }
@@ -25,11 +28,15 @@
     async function onSearch(event) {
         try {
             mode = 'search'
+            await sleep(1000)
             jokes = await searchJokes(event.detail)
+            await sleep(1000)
         } catch(e) {
             console.log(e)
         }
     }
+
+    const sleep = delayMS => new Promise(res => setTimeout(res, delayMS))
 </script>
 
 <style>
@@ -72,29 +79,35 @@
     </Row>
 
     {#if mode ==='random'}
-    <Row>
-        <Col>
-            <Joke joke={randomJoke} />
-        </Col>
-    </Row>
+    <Transition>
+        <Row>
+            <Col>
+                <Joke joke={randomJoke} />
+            </Col>
+        </Row>
+    </Transition>
     {/if}
 
     {#if mode === 'search' && jokes.length > 0}
-    <Row>
-        <Col>
-            {#each jokes as joke (joke.id)}
-                <Joke joke={joke.joke} />
-            {/each}
-        </Col>
-    </Row>
+    <transition>
+        <Row>
+            <Col>
+                {#each jokes as joke (joke.id)}
+                    <Joke joke={joke.joke} />
+                {/each}
+            </Col>
+        </Row>
+    </transition>
     {/if}
 
     {#if mode === 'search' && jokes.length == 0}
-    <Row>
-        <Col>
-            <Joke joke="Jokes on you !!! :) Please try another search." />
-        </Col>
-    </Row>
+    <Transition>
+        <Row>
+            <Col>
+                <Joke joke="Jokes on you !!! :) Please try another search." />
+            </Col>
+        </Row>
+    </Transition>
     {/if}
 
 </Container>
