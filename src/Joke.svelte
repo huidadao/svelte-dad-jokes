@@ -1,6 +1,6 @@
 <script>
     import { Card } from 'sveltestrap';
-    export let randomJoke
+    export let joke
 </script>
 
-<Card body>{randomJoke}</Card>
+<Card body>{joke}</Card>

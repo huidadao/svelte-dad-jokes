@@ -1,12 +1,13 @@
 <script lang="ts">
     import { onMount } from 'svelte'
-    import { getRandomJoke } from './api.js'
+    import { getRandomJoke, searchJokes } from './api.js'
     import { Col, Container, Row, Button } from 'sveltestrap';
     import Form from './Form.svelte'
     import Joke from './Joke.svelte'
 
     let randomJoke
-    let mode = 'random'
+    let jokes = []
+    let mode = 'waiting'
 
     onMount(async () => {
         onRandomJoke()
@@ -14,7 +15,17 @@
 
     async function onRandomJoke() {
         try {
+            mode = 'random'
             randomJoke = await getRandomJoke()
+        } catch(e) {
+            console.log(e)
+        }
+    }
+
+    async function onSearch(event) {
+        try {
+            mode = 'search'
+            jokes = await searchJokes(event.detail)
         } catch(e) {
             console.log(e)
         }
@@ -49,7 +60,7 @@
         </Col>
     </Row>
 
-    <Form />
+    <Form on:search={onSearch} />
 
     <Row>
         <Col>
@@ -60,10 +71,30 @@
         </Col>
     </Row>
 
+    {#if mode ==='random'}
     <Row>
         <Col>
-            <Joke {randomJoke} />
+            <Joke joke={randomJoke} />
         </Col>
     </Row>
+    {/if}
+
+    {#if mode === 'search' && jokes.length > 0}
+    <Row>
+        <Col>
+            {#each jokes as joke (joke.id)}
+                <Joke joke={joke.joke} />
+            {/each}
+        </Col>
+    </Row>
+    {/if}
+
+    {#if mode === 'search' && jokes.length == 0}
+    <Row>
+        <Col>
+            <Joke joke="Jokes on you !!! :) Please try another search." />
+        </Col>
+    </Row>
+    {/if}
 
 </Container>
